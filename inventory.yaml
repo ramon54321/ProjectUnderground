@@ -9,3 +9,4 @@ all:
     packages:
     - name: "tree"
     - name: "git"
+    - name: "ranger"

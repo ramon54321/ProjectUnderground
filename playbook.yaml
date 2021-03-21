@@ -36,28 +36,11 @@
     - name: Install Git
       apt:
         name: "git"
-    - name: Create provision folder 
-      file:
-        path: "/provision"
-        state: directory
-        mode: '1777'
-    - name: Check provision folder contents
-      command:
-        cmd: "ls -la /provision"
-      register: "provision"
-    - name: Download Oh My Zsh
-      get_url:
-        dest: "/provision/ohmyzsh_install.sh"
-        url: "https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
-      when: "provision.stdout.find('ohmyzsh_install') == -1"
-    - name: Mod permissions of Oh My Zsh installer
-      file:
-        path: "/provision/ohmyzsh_install.sh"
-        mode: '1777'
     - name: Install Oh My Zsh
-      command:
-        cmd: "runuser -l {{ item.name }} -c '/provision/ohmyzsh_install.sh --unattended'"
-      when: "provision.stdout.find('ohmyzsh_install') == -1"
+      shell:
+        warn: false
+        creates: "/home/{{ item.name }}/.oh-my-zsh"
+        cmd: "runuser -l {{ item.name }} -c 'curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh | sh'"
       with_items: "{{ users }}"
     - name: Copy .zshrc
       copy:
@@ -77,3 +60,9 @@
       apt:
         name: "{{ item.name }}"
       with_items: "{{ packages }}"
+    - name: Install NVM
+      shell:
+        warn: false
+        creates: "/home/{{ item.name }}/.nvm"
+        cmd: "runuser -l {{ item.name }} -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | zsh'"
+      with_items: "{{ users }}"
