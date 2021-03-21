@@ -10,3 +10,5 @@ all:
     - name: "tree"
     - name: "git"
     - name: "ranger"
+    - name: "unzip"
+    - name: "zip"

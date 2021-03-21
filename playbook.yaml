@@ -27,6 +27,12 @@
         state: "present"
         regexp: "^%admin"
         line: "%admin ALL=(ALL) NOPASSWD: ALL"
+    - name: Create projects folder 
+      file:
+        path: "/home/{{ item.name }}/projects"
+        state: directory
+        mode: '1777'
+      with_items: "{{ users }}"
     - name: Update Apt
       apt:
         update_cache: true
@@ -66,3 +72,18 @@
         creates: "/home/{{ item.name }}/.nvm"
         cmd: "runuser -l {{ item.name }} -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | zsh'"
       with_items: "{{ users }}"
+    - name: Install JDK
+      shell:
+        warn: false
+        creates: "/opt/jdk-16"
+        cmd: "wget -c --header 'Cookie: oraclelicense=accept-securebackup-cookie' https://download.oracle.com/otn-pub/java/jdk/16+36/7863447f0ab643c585b9bdebf67c69db/jdk-16_linux-x64_bin.tar.gz && tar -xf jdk-16_linux-x64_bin.tar.gz && mv /root/jdk-16 /opt && rm -f /root/jdk-16_linux-x64_bin.tar.gz"
+    - name: Install SBT
+      shell:
+        warn: false
+        creates: "/opt/sbt"
+        cmd: "wget https://github.com/sbt/sbt/releases/download/v1.4.8/sbt-1.4.8.tgz && tar -xf sbt-1.4.8.tgz && mv /root/sbt /opt && rm -f /root/sbt-1.4.8.tgz"
+    - name: Install Scala
+      shell:
+        warn: false
+        creates: "/opt/scala-2.13.5"
+        cmd: "wget https://downloads.lightbend.com/scala/2.13.5/scala-2.13.5.tgz && tar -xf scala-2.13.5.tgz && mv /root/scala-2.13.5 /opt && rm -f /root/scala-2.13.5.tgz"

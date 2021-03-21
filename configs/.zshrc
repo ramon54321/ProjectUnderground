@@ -1,5 +1,11 @@
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
+# Set up PATH
+export PATH=$HOME/bin:/usr/local/bin:~:$PATH
+export PATH=./node_modules/.bin:$PATH
+export PATH=/opt/jdk-16/bin:$PATH
+export PATH=/opt/sbt/bin:$PATH
+export PATH=/opt/scala-2.13.5/bin:$PATH
+
+export JAVA_HOME=/opt/jdk-16
 
 # Path to your oh-my-zsh installation.
 export ZSH="/home/ramon/.oh-my-zsh"
@@ -73,6 +79,7 @@ ZSH_THEME="bureau"
 plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
+source $HOME/.nvm/nvm.sh
 
 # User configuration
 
