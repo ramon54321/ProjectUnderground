@@ -1,0 +1,11 @@
+# IP setup in ~.ssh/config
+all:
+  hosts:
+    master-root:
+  vars:
+    users:
+    - name: "ramon"
+      groups: "admin"
+    packages:
+    - name: "tree"
+    - name: "git"

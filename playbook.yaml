@@ -1,0 +1,79 @@
+---
+- name: Setup Master
+  hosts: all 
+  remote_user: root
+  tasks:
+    - name: Set Hostname
+      command:
+        cmd: "hostnamectl set-hostname master"
+    - name: Create admin group
+      group:
+        name: admin
+        state: present
+    - name: Create user
+      user:
+        name: "{{ item.name }}"
+        groups: admin
+        shell: /bin/zsh
+      with_items: "{{ users }}"
+    - name: SSH Pub Key
+      authorized_key:
+        user: "{{ item.name }}"
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+      with_items: "{{ users }}"
+    - name: Allow passwordless sudo
+      lineinfile:
+        dest: "/etc/sudoers"
+        state: "present"
+        regexp: "^%admin"
+        line: "%admin ALL=(ALL) NOPASSWD: ALL"
+    - name: Update Apt
+      apt:
+        update_cache: true
+    - name: Install Zsh
+      apt:
+        name: "zsh"
+    - name: Install Git
+      apt:
+        name: "git"
+    - name: Create provision folder 
+      file:
+        path: "/provision"
+        state: directory
+        mode: '1777'
+    - name: Check provision folder contents
+      command:
+        cmd: "ls -la /provision"
+      register: "provision"
+    - name: Download Oh My Zsh
+      get_url:
+        dest: "/provision/ohmyzsh_install.sh"
+        url: "https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
+      when: "provision.stdout.find('ohmyzsh_install') == -1"
+    - name: Mod permissions of Oh My Zsh installer
+      file:
+        path: "/provision/ohmyzsh_install.sh"
+        mode: '1777'
+    - name: Install Oh My Zsh
+      command:
+        cmd: "runuser -l {{ item.name }} -c '/provision/ohmyzsh_install.sh --unattended'"
+      when: "provision.stdout.find('ohmyzsh_install') == -1"
+      with_items: "{{ users }}"
+    - name: Copy .zshrc
+      copy:
+        dest: "/home/{{ item.name }}/.zshrc"
+        mode: '1644'
+        src: "./configs/.zshrc"
+      with_items: "{{ users }}"
+      
+- name: Setup Packages Master
+  hosts: all 
+  remote_user: root
+  tasks:
+    - name: Update Apt
+      apt:
+        update_cache: true
+    - name: Install Packages
+      apt:
+        name: "{{ item.name }}"
+      with_items: "{{ packages }}"
