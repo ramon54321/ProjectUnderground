@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "package": "pkg -t node14-mac -o dist/dev ./index.js",
+    "distribute": "npm run package && mkdir -p ~/bin && cp dist/dev ~/bin/dev"
+  },
+  "dependencies": {
+    "chokidar": "^3.5.1",
+    "yargs": "^16.2.0"
+  },
+  "devDependencies": {
+    "pkg": "^4.5.0"
+  }
+}
